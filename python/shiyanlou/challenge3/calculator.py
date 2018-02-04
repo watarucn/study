@@ -7,23 +7,15 @@ class Config (object):
     def __init__(self,configfile):
         self._config = self._read_config(configfile)
     def _read_config(self,filename):  
-        try:
-            file=open(filename)
-        except:
-            print("Not Found FILE")
-        finally:
-            file.close()
-
-        config = {}   
-
-        for line in file.readlines():
-            temp = line.split('=')
-            try:
-                config[temp[0].strip()]=int(temp[1].strip())
-            except:
-                print("Parament Error")
-        
-        return config
+        with open(filename) as file:
+            config = {}   
+            for line in file.readlines():
+                temp = line.split('=')
+                try:
+                    config[temp[0].strip()]=int(temp[1].strip())
+                except:
+                    print("Parament Error")
+                return config
 
     def get_config(self,name):
         return self._config.get(name)
@@ -42,20 +34,14 @@ class UserData(object):
         self.Income = self._data.values()
 
     def _read_data(self,filename):
-        try:
-            file=open(filename)
-        except:
-            print("Not Found File")
-        finally:
-            file.close()
-
-        data={}
-        for line in flie.readlines():
-            temp = line.split(',')
-            try:            
-                data[int(temp[0])]=float(temp[1])
-            except:
-                print("Paramen Error")
+        with open(filename) as file:
+            data={}
+            for line in flie.readlines():
+                temp = line.split(',')
+                try:            
+                    data[int(temp[0])]=float(temp[1])
+                except:
+                    print("Paramen Error")
 
     def calc(self,JishuL,JishuH,SocialTaxRate):
         result=[]
@@ -92,7 +78,7 @@ class UserData(object):
 
            IncomeSubTax = IncomeSubSocial - Tax
            
-           result.append('%d,%d,%2.f,%2.f,%2.f,'%(self.ID[n],self.Income[n],SocialTax,Tax,IncomeSubTax)
+           result.append('%d,%d,%2.f,%2.f,%2.f,'%(self.ID[n],self.Income[n],SocialTax,Tax,IncomeSubTax))
 
         return result       
 
