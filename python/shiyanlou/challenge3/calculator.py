@@ -2,6 +2,26 @@
 # -*- coding:utf-8 -*-
 
 import sys
+class Args(object):
+    def __init__(self):
+        self.op=[]
+        self.path=[]
+        self._opration()
+    def _opration(self):
+        n = 0
+        try:
+            temp = sys.argv[1:]
+            for n in range(0,len(temp),2):
+                self.op.append(temp[n])
+                self.path.append(temp[n+1])
+        except:
+            print("Parament Error In Args")
+    def get_path(self,opr):
+        try:
+            index = self.op.index(opr)
+        except:
+            print("Parament Error In Args")
+        return self.path[index]
 
 class Config (object):
     def __init__(self,configfile):
@@ -21,29 +41,30 @@ class Config (object):
         return self._config.get(name)
 
     def get_SocialTax(self):
-        value = self._config.values()
+        temp = self._config
+        temp.pop('JiShuL')
+        temp.pop('JiShuH')
+        value = temp.values()
         n = 0        
-        for val in list(value)[2:]:
+        for val in value:
             n += val
         return n
 
 class UserData(object):
     def __init__(self,userdatafile):
-        self._data = self._read_data(userdatafile)
-        self.ID = list(self._data.keys())
-        self.Income = list(self._data.values())
-
+        self.ID =[]
+        self.Income=[]
+        self._read_data(userdatafile)
 
     def _read_data(self,filename):
         with open(filename) as file:
-            data={}
             for line in file.readlines():
                 temp = line.split(',')
                 try:            
-                    data[int(temp[0].strip())]=float(temp[1].strip())
+                    self.ID.append(int(temp[0].strip()))
+                    self.Income.append(float(temp[1].strip()))
                 except:
                     print("Paramen Error In UserData class")
-            return data
 
     def calc(self,JishuL,JishuH,SocialTaxRate):
         result=[]
@@ -80,16 +101,20 @@ class UserData(object):
 
            IncomeSubTax = IncomeSubSocial - Tax
            
-           result.append('%d,%d,%2.f,%2.f,%2.f,'%(self.ID[n],self.Income[n],SocialTax,Tax,IncomeSubTax))
+           result.append('%d,%d,%.2f,%.2f,%.2f\n'%(self.ID[n],self.Income[n],SocialTax,Tax,IncomeSubTax))
 
         return result       
+def Write_Csv(path,string):
+    with open(path,'a',) as file:
+        file.write(string)
 
 if __name__ == '__main__':
+    args = Args()
+    config =Config(args.get_path('-c'))
+    user = UserData(args.get_path('-d'))
 
-    config =Config(sys.argv[1])
-    user = UserData(sys.argv[2])
     money = user.calc(config.get_config('JiShuL'),config.get_config('JiShuH'),config.get_SocialTax())
     for x in money:    
-        print(x)
+        Write_Csv(args.get_path('-o'),x)
            
         
