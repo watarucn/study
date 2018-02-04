@@ -12,36 +12,38 @@ class Config (object):
             for line in file.readlines():
                 temp = line.split('=')
                 try:
-                    config[temp[0].strip()]=int(temp[1].strip())
+                    config[temp[0].strip()]=float(temp[1].strip())
                 except:
-                    print("Parament Error")
-                return config
+                    print("Parament Error In Config Class")
+            return config
 
     def get_config(self,name):
         return self._config.get(name)
 
-    def get_SocialFax(self):
+    def get_SocialTax(self):
         value = self._config.values()
         n = 0        
-        for val in value[2:]:
+        for val in list(value)[2:]:
             n += val
         return n
 
 class UserData(object):
     def __init__(self,userdatafile):
         self._data = self._read_data(userdatafile)
-        self.ID = self._data.keys()
-        self.Income = self._data.values()
+        self.ID = list(self._data.keys())
+        self.Income = list(self._data.values())
+
 
     def _read_data(self,filename):
         with open(filename) as file:
             data={}
-            for line in flie.readlines():
+            for line in file.readlines():
                 temp = line.split(',')
                 try:            
-                    data[int(temp[0])]=float(temp[1])
+                    data[int(temp[0].strip())]=float(temp[1].strip())
                 except:
-                    print("Paramen Error")
+                    print("Paramen Error In UserData class")
+            return data
 
     def calc(self,JishuL,JishuH,SocialTaxRate):
         result=[]
@@ -52,7 +54,7 @@ class UserData(object):
            elif self.Income[n]>JishuH:
                Money = JishuH
            else:
-               Money = self.Income[n]
+               Money = float(self.Income[n])
 
            SocialTax = Money * SocialTaxRate
            IncomeSubSocial = self.Income[n]-SocialTax
@@ -86,7 +88,7 @@ if __name__ == '__main__':
 
     config =Config(sys.argv[1])
     user = UserData(sys.argv[2])
-    money = user.calc(config.get_config(JishuL),config.get_config(JishuH),config.get_SocialTax)
+    money = user.calc(config.get_config('JiShuL'),config.get_config('JiShuH'),config.get_SocialTax())
     for x in money:    
         print(x)
            
